@@ -69,24 +69,30 @@ def save_model(model, optimizer, scheduler, scaler, epoch, config):
             'optimizer': optimizer.state_dict(),
             'scheduler': scheduler.state_dict(),
             'epoch': epoch + 1,
-            'scaler': scaler,
+            'scaler': scaler.state_dict(),
         },
-        '{}/Epoch {}.pt'.format(config.LOG.SAVED_MODELS, epoch)
+        '{}/Epoch-{}.pt'.format(config.LOG.SAVED_MODELS, epoch)
     )
     print("Model save: ", '{}/Epoch {}.pt'.format(config.LOG.SAVED_MODELS, epoch))
 
 
 def parse_option():
     parser = argparse.ArgumentParser("SRDM")
-    parser.add_argument('--model_name', type=str, default="resnet", help='Model to train, possible options - resnet, mobilenet')
+    parser.add_argument('--model-name', type=str, default="resnet", help='Model to train, possible options - resnet, mobilenet')
     parser.add_argument('--version', type=str, default="", help="train version, template -- frames: _, loss: _, emb: _")
     parser.add_argument("--ce", type=int, default=1, help="Include cross-entropy loss? 0 -- False, 1 -- True")
     parser.add_argument("--trp", type=int, default=1, help="Include triplet loss? 0 -- False, 1 -- True")
     parser.add_argument("--std", type=int, default=1, help="Include variance loss? 0 -- False, 1 -- True")
     parser.add_argument('--pretrained', type=str, default="", help='pretrained weight from checkpoint')
+    parser.add_argument('--embedding-size', type=int, default=64, help="embedding size")
+    parser.add_argument('--n_frames', type=int, default=2, help="the number of frames")
 
     parser.add_argument('--batch-size', type=int, default=32, help="batch size for GPU")
     parser.add_argument('--accumulation-steps', type=int, default=1, help="gradient accumulation steps")
+
+    parser.add_argument('--test-data-path', type=str, default="", help='path to test dataset')
+
+    parser.add_argument('--num_workers', type=int, default=2, help="the number of workers")
     args, unparsed = parser.parse_known_args()
     config = get_config(args)
 
