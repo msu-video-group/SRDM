@@ -27,10 +27,10 @@ def build_dataloader(config):
     sr_paths = [f"Original/{dataset}" for dataset in config.DATA.SR_METHODS_TRAIN] + \
                [f"Compressed/{dataset}" for dataset in config.DATA.SR_METHODS_TRAIN]
 
-    additional_targets = {f"frame_{i}": "image" for i in range(1, config.DATA.N_FRAMES)}
+    additional_targets = {f"frame_{i}": "image" for i in range(1, config.MODEL.N_FRAMES)}
 
     datasetTrain = DataLoader(
-        CustomVideoFramesDatasetLoaderTriplet(gt_paths, sr_paths, path_to_video_dataset, n_frames=config.DATA.N_FRAMES,
+        CustomVideoFramesDatasetLoaderTriplet(gt_paths, sr_paths, path_to_video_dataset, n_frames=config.MODEL.N_FRAMES,
                                               transforms=albu.Compose([
                                                   albu.RandomCrop(config.DATA.IMAGE_SIZE, config.DATA.IMAGE_SIZE, p=1),
                                                   CoarseDropout(max_holes=2,
@@ -41,8 +41,8 @@ def build_dataloader(config):
         batch_size=config.TRAIN.BATCH_SIZE, shuffle=True, num_workers=config.DATA.NUM_WORKERS, pin_memory=True)
 
     # Without compressing
-    folder = f'{config.DATA.DATA_PATH_TEST}/Original'
-    datasets_original_video = ["GT"] + config.DATA.SR_METHODS_TEST
+    folder = f'{config.DATA.DATA_PATH_VAL}/Original'
+    datasets_original_video = ["GT"] + config.DATA.SR_METHODS_VAL
     datasetValidVideoOriginal = dict()
     for dataset in datasets_original_video:
         datasetValidVideoOriginal[dataset] = DataLoader(
@@ -50,12 +50,12 @@ def build_dataloader(config):
                                            transforms=albu.Compose([
                                                transform_normalize
                                            ], p=1, additional_targets=additional_targets),
-                                           n_frames=config.DATA.N_FRAMES),
-            batch_size=config.TEST.BATCH_SIZE, shuffle=False, num_workers=config.DATA.NUM_WORKERS)
+                                           n_frames=config.MODEL.N_FRAMES),
+            batch_size=config.VAL.BATCH_SIZE, shuffle=False, num_workers=config.DATA.NUM_WORKERS)
 
     # With video compressing
-    folder = f'{config.DATA.DATA_PATH_TEST}/Compressed'
-    datasets_compressed_video = ["GT"] + config.DATA.SR_METHODS_TEST
+    folder = f'{config.DATA.DATA_PATH_VAL}/Compressed'
+    datasets_compressed_video = ["GT"] + config.DATA.SR_METHODS_VAL
     datasetValidVideoCompressed = dict()
     for dataset in datasets_compressed_video:
         datasetValidVideoCompressed[dataset] = DataLoader(
@@ -63,10 +63,58 @@ def build_dataloader(config):
                                            transforms=albu.Compose([
                                                transform_normalize
                                            ], p=1, additional_targets=additional_targets),
-                                           n_frames=config.DATA.N_FRAMES),
-            batch_size=config.TEST.BATCH_SIZE, shuffle=False, num_workers=config.DATA.NUM_WORKERS)
+                                           n_frames=config.MODEL.N_FRAMES),
+            batch_size=config.VAL.BATCH_SIZE, shuffle=False, num_workers=config.DATA.NUM_WORKERS)
 
     return datasetTrain, datasetValidVideoOriginal, datasetValidVideoCompressed
+
+
+def build_test_dataloader(video_path, config):
+    additional_targets = {f"frame_{i}": "image" for i in range(1, config.MODEL.N_FRAMES)}
+
+    dataloader = DataLoader(VideoFramesDataset(video_path,
+                                               transforms=albu.Compose([
+                                                   transform_normalize
+                                               ], p=1, additional_targets=additional_targets),
+                                               n_frames=config.MODEL.N_FRAMES),
+                            batch_size=config.TEST.BATCH_SIZE,
+                            shuffle=False,
+                            num_workers=config.DATA.NUM_WORKERS)
+    return dataloader
+
+
+class VideoFramesDataset(Dataset):
+    def __init__(self, video_path, transforms=None, n_frames=1):
+        self.list_of_files = [os.path.join(video_path, file) for file in sorted(os.listdir(video_path))]
+        self.transforms = transforms
+        self.n_frames = n_frames
+        self.len = len(self.list_of_files)
+
+    def __len__(self):
+        return self.len
+
+    def _get_frames(self, idx):
+        frames = []
+        for i_ in range(idx, idx + self.n_frames):
+            i = min(i_, self.len - 1)
+            frame = read_cv_image(self.list_of_files[i])
+            frames.append(frame)
+
+        args = {'image': frames[0]}
+        for i in range(1, self.n_frames):
+            args[f"frame_{i}"] = frames[i]
+
+        if self.transforms is not None:
+            result = self.transforms(**args)
+            frames = [result["image"]]
+            for i in range(1, self.n_frames):
+                frames.append(result[f"frame_{i}"])
+
+        return np.concatenate(frames, axis=0)
+
+    def __getitem__(self, idx):
+        frames = self._get_frames(idx)
+        return frames
 
 
 class CustomVideoFramesDatasetLoader(Dataset):

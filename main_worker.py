@@ -36,7 +36,7 @@ def main_worker(config):
 
     for epoch in range(epoch, config.TRAIN.NUM_EPOCHS):
         train(model, device, optimizer, criterion, scheduler, scaler, epoch, datasetTrain, writer_train, config)
-        if (epoch + 1) % config.TEST.FREQ == 0:
+        if (epoch + 1) % config.VAL.FREQ == 0:
             validate(model, datasetValidVideoOriginal, datasetValidVideoCompressed, device, writer_valid, epoch, config)
         if (epoch + 1) % config.SAVE_FREQ == 0:
             save_model(model, optimizer, scheduler, scaler, epoch, config)

@@ -9,11 +9,9 @@ _C = CN()
 _C.DATA = CN()
 # Path to dataset, could be overwritten
 _C.DATA.DATA_PATH_TRAIN = '/mnt/hdd/datasets/SR-metric-dataset/VideoTrainDataset/'
-_C.DATA.DATA_PATH_TEST = '/home/vyacheslav/mnt/mycalypso/Benchmark/ValidationDataset/Video/'
+_C.DATA.DATA_PATH_VAL = '/home/vyacheslav/mnt/mycalypso/Benchmark/ValidationDataset/Video/'
 _C.DATA.SR_METHODS_TRAIN = ['Real-ESRGAN', 'RRN', 'RBPN', 'SOF_VSR', 'Topaz-4x', 'RealSRDataset', 'ESRGAN']
-_C.DATA.SR_METHODS_TEST = ['Real-ESRGAN', 'RRN', 'RBPN', 'SOF_VSR', 'Topaz', 'LGFN']
-# Number of input consecutive frames
-_C.DATA.N_FRAMES = 2
+_C.DATA.SR_METHODS_VAL = ['Real-ESRGAN', 'RRN', 'RBPN', 'SOF_VSR', 'Topaz', 'LGFN']
 # Input image size
 _C.DATA.IMAGE_SIZE = 224
 # Number of data loading threads
@@ -41,6 +39,8 @@ _C.MODEL.PRETRAINED = ''
 # Number of classes, overwritten in data preparation
 _C.MODEL.NUM_CLASSES = 2
 _C.MODEL.EMBEDDING_SIZE = 64
+# Number of input consecutive frames
+_C.MODEL.N_FRAMES = 2
 # Loss
 _C.MODEL.LOSS = CN()
 _C.MODEL.LOSS.TRIPLET_MARGIN = 1.9
@@ -74,10 +74,19 @@ _C.TRAIN.OPTIMIZER.BETAS = (0.9, 0.999)
 # -----------------------------------------------------------------------------
 # Testing settings
 # -----------------------------------------------------------------------------
+_C.VAL = CN()
+_C.VAL.BATCH_SIZE = 1
+_C.VAL.FREQ = 10
+_C.VAL.PRINT_IMAGE_FREQ = 10
+
+# -----------------------------------------------------------------------------
+# Testing settings
+# -----------------------------------------------------------------------------
 _C.TEST = CN()
 _C.TEST.BATCH_SIZE = 1
-_C.TEST.FREQ = 10
-_C.TEST.PRINT_IMAGE_FREQ = 10
+_C.TEST.DATA_PATH = ''
+_C.TEST.QUANTILE = 0.1
+_C.TEST.RESULT_PATH = 'results'
 
 # -----------------------------------------------------------------------------
 # Misc
@@ -98,7 +107,11 @@ def update_config(config, args):
     config.MODEL.LOSS.STD = args.std
     config.MODEL.PRETRAINED = args.pretrained
     config.TRAIN.BATCH_SIZE = args.batch_size
+    config.MODEL.EMBEDDING_SIZE = args.embedding_size
+    config.MODEL.N_FRAMES = args.n_frames
+    config.DATA.NUM_WORKERS = args.num_workers
     config.TRAIN.ACCUMULATION_STEPS = args.accumulation_steps
+    config.TEST.DATA_PATH = args.test_data_path
 
     config.freeze()
 

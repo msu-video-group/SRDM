@@ -28,10 +28,10 @@ def build_logger(config):
 def build_model(config):
     model_name = config.MODEL.NAME
     if model_name.startswith("resnet"):
-        model = SRDetectorResnet(n_classes=config.MODEL.NUM_CLASSES, n_channels=int(config.MODEL.NUM_CLASSES * 3),
+        model = SRDetectorResnet(n_classes=config.MODEL.NUM_CLASSES, n_channels=int(config.MODEL.N_FRAMES * 3),
                                  embedding_size=config.MODEL.EMBEDDING_SIZE)
     elif model_name.startswith("mobilenet"):
-        model = SRDetectorMobilenet(n_classes=config.MODEL.NUM_CLASSES, n_channels=int(config.MODEL.NUM_CLASSES * 3),
+        model = SRDetectorMobilenet(n_classes=config.MODEL.NUM_CLASSES, n_channels=int(config.MODEL.N_FRAMES * 3),
                                     embedding_size=config.MODEL.EMBEDDING_SIZE)
     else:
         raise Exception("Unknown model name")
