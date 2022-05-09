@@ -29,20 +29,26 @@ class SRDetectorResnet(nn.Module):
 
         self.projector = nn.Linear(in_features=2048, out_features=embedding_size, bias=True)
 
-        self.projector = nn.Sequential(
-            nn.Linear(in_features=2048, out_features=1024, bias=True),
-            nn.ReLU(),
-            nn.Linear(in_features=1024, out_features=1024, bias=True),
-            nn.ReLU(),
-            nn.Linear(in_features=1024, out_features=embedding_size, bias=True),
-        )
+        # self.projector = nn.Sequential(
+        #     nn.Linear(in_features=2048, out_features=1024, bias=True),
+        #     nn.ReLU(),
+        #     nn.Linear(in_features=1024, out_features=1024, bias=True),
+        #     nn.ReLU(),
+        #     nn.Linear(in_features=1024, out_features=embedding_size, bias=True),
+        # )
+
+        # self.classifier = nn.Sequential(
+        #     nn.Linear(in_features=embedding_size, out_features=512, bias=True),
+        #     nn.ReLU(),
+        #     nn.Linear(in_features=512, out_features=128, bias=True),
+        #     nn.ReLU(),
+        #     nn.Linear(in_features=128, out_features=n_classes, bias=True),
+        # )
 
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=embedding_size, out_features=512, bias=True),
+            nn.Linear(in_features=embedding_size, out_features=embedding_size, bias=True),
             nn.ReLU(),
-            nn.Linear(in_features=512, out_features=128, bias=True),
-            nn.ReLU(),
-            nn.Linear(in_features=128, out_features=n_classes, bias=True),
+            nn.Linear(in_features=embedding_size, out_features=n_classes, bias=True),
         )
 
         self.n_classes = n_classes
