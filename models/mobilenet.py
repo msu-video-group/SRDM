@@ -36,26 +36,6 @@ class SRDetectorMobilenet(nn.Module):
         self.embedding_size = embedding_size
         self.n_channels = n_channels
 
-    def finetune_step1(self):
-        for param in self.feature_extractor.parameters():
-            param.requires_grad = False
-
-        for param in self.projector.parameters():
-            param.requires_grad = True
-
-        for param in self.classifier.parameters():
-            param.requires_grad = True
-
-    def finetune_step2(self):
-        for param in self.feature_extractor.parameters():
-            param.requires_grad = True
-
-        for param in self.projector.parameters():
-            param.requires_grad = True
-
-        for param in self.classifier.parameters():
-            param.requires_grad = True
-
     def get_embeddings(self):
         return self.embeddings
 
