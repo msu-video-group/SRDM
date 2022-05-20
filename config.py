@@ -92,7 +92,7 @@ _C.TEST.RESULT_PATH = 'results'
 # Misc
 # -----------------------------------------------------------------------------
 # Frequency to save checkpoint
-_C.SAVE_FREQ = 10
+_C.SAVE_FREQ = 5
 # Fixed random seed
 _C.SEED = 0
 
