@@ -146,13 +146,14 @@ python3 main_worker.py --num_workers=2 --n_frames=2 --model-name=resnet --batch-
 ```
 
 ## Cite Us
+```
 @article{meshchaninov2022combining,
   title={Combining Contrastive and Supervised Learning for Video Super-Resolution Detection},
   author={Meshchaninov, Viacheslav and Molodetskikh, Ivan and Vatolin, Dmitriy},
   journal={arXiv preprint arXiv:2205.10406},
   year={2022}
 }
-
+```
 
 
 
