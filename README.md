@@ -3,7 +3,7 @@
 SRDM is a new upscaled-resolution-detection method based on learning of visual representations using contrastive and
 cross-entropy losses.
 
-See our [paper]() for details.
+See our [paper](https://arxiv.org/pdf/2205.10406.pdf) for details.
 
 ## Dependencies and Installation
 
@@ -60,7 +60,7 @@ See our [paper]() for details.
 
 ## Description
 
-SRDM is initially described in [paper](). It's a novel approach to video-super-resolution detection that combines
+SRDM is initially described in [paper](https://arxiv.org/pdf/2205.10406.pdf). It's a novel approach to video-super-resolution detection that combines
 contrasting and supervised learning. The method first uses a ResNet backbone to extract deep features and then uses a
 lightweight MLP networks to project and classify representation of input frames. Our method achieved good performance in
 extensive experiments.
@@ -146,7 +146,12 @@ python3 main_worker.py --num_workers=2 --n_frames=2 --model-name=resnet --batch-
 ```
 
 ## Cite Us
-
+@article{meshchaninov2022combining,
+  title={Combining Contrastive and Supervised Learning for Video Super-Resolution Detection},
+  author={Meshchaninov, Viacheslav and Molodetskikh, Ivan and Vatolin, Dmitriy},
+  journal={arXiv preprint arXiv:2205.10406},
+  year={2022}
+}
 
 
 
