@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class TripletLoss_std(nn.Module):
+class TripletLoss(nn.Module):
     def __init__(self, config=None):
         super(TripletLoss_std, self).__init__()
         self.ce_flag = config.MODEL.LOSS.CE
@@ -16,15 +16,6 @@ class TripletLoss_std(nn.Module):
             distance_function=lambda x, y: 1.0 - F.cosine_similarity(x, y), margin=self.margin)
         loss = triplet_loss_func(anchors, positives, negatives)
         return loss
-
-    def variance_loss(self, anchors, positives, negatives):
-        std_z_a = torch.sqrt(anchors.var(dim=0) + 1e-04)
-        std_z_p = torch.sqrt(positives.var(dim=0) + 1e-04)
-        std_z_n = torch.sqrt(negatives.var(dim=0) + 1e-04)
-        std_loss = torch.mean(F.relu(1 - std_z_a)) + \
-                   torch.mean(F.relu(1 - std_z_p)) + \
-                   torch.mean(F.relu(1 - std_z_n))
-        return std_loss
 
     def crossentropy_loss(self, outputs, anchors, positives, negatives, labels):
         clf_loss = 1 / 4 * F.cross_entropy(outputs[:anchors.shape[0]], labels[:anchors.shape[0]]) + \
@@ -43,6 +34,4 @@ class TripletLoss_std(nn.Module):
             loss += self.crossentropy_loss(outputs, anchors, positives, negatives, labels)
         if self.trp_flag:
             loss += self.triplet_loss(anchors, positives, negatives)
-        if self.std_flag:
-            loss += self.variance_loss(anchors, positives, negatives)
         return loss
