@@ -5,7 +5,7 @@ from timm.scheduler.cosine_lr import CosineLRScheduler
 
 from models.resnet import SRDetectorResnet
 from models.mobilenet import SRDetectorMobilenet
-from loss import TripletLoss_std
+from loss import TripletLoss
 
 
 def build_logger(config):
@@ -78,4 +78,4 @@ def build_epoch(config):
 
 
 def build_criterion(config):
-    return TripletLoss_std(config)
+    return TripletLoss(config)
